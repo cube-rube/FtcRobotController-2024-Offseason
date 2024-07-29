@@ -29,6 +29,9 @@ public class TrajectoryFollower extends LinearOpMode {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
+        // TODO : НЕ КОЛХОЗИТЬ
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+
         final BezierCurveLinkedList curves;
         try {
             BezierCurve[] curvesArray = objectMapper.readValue(TrajectoryFiles.loadFile(AUTONOMOUS_NAME), BezierCurve[].class);
@@ -36,8 +39,6 @@ public class TrajectoryFollower extends LinearOpMode {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
 
         Thread fieldDrawing = new Thread(() -> {
