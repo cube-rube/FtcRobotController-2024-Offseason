@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.math;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 
@@ -78,5 +80,14 @@ public class BezierCurve {
         } else if (ind == 3) {
             point3 = vector;
         }
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Bezier curve: " + point0.getX() + " " + point0.getY() +
+                " " + point1.getX() + " " + point1.getY() +
+                " " + point2.getX() + " " + point2.getY() +
+                " " + point3.getX() + " " + point3.getY();
     }
 }

@@ -23,8 +23,6 @@ public class DrawCurve extends LinearOpMode {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = dashboard.getTelemetry();
 
-        FieldDrawer drawer = new FieldDrawer();
-
         BezierCurve bezierCurve = new BezierCurve(
                 new Vector2d(0, 0),
                 new Vector2d(0, 40),
@@ -52,7 +50,7 @@ public class DrawCurve extends LinearOpMode {
             Canvas canvas = packet.fieldOverlay();
 
 
-            drawer.drawBezierCurve(canvas, bezierCurve, 1, "green");
+            FieldDrawer.drawBezierCurve(canvas, bezierCurve, 1, "green");
 
             dashboard.sendTelemetryPacket(packet);
         }
