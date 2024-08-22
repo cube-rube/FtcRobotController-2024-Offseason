@@ -81,19 +81,6 @@ public class BezierCurve {
             point3 = vector;
         }
     }
-    
-    public double getClosestValueToPoint(Vector2d point) {
-        int scans = 50;
-        double min = Double.MAX_VALUE, t = 0;
-        for (int i = 0; i <= scans; ++i) {
-            double distance = squaredDistance(point, getPointAt((double) i / scans));
-            if (distance < min) {
-                min = distance;
-                t = (double) i / scans;
-            }
-        }
-        return t;
-    }
 
     public double getClosestTtoPoint(Vector2d point) {
         int ind = 0, scans = 25;
@@ -123,7 +110,7 @@ public class BezierCurve {
                 left = mid;
             }
         }
-        return mid;
+        return left;
     }
 
     private double squaredDistance(Vector2d point0, Vector2d point1) {
