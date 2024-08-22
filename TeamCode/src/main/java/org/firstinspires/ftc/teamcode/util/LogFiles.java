@@ -17,9 +17,8 @@ import com.qualcomm.robotcore.util.WebHandlerManager;
 import org.firstinspires.ftc.ftccommon.external.WebHandlerRegistrar;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.drive.SampleTankDrive;
-import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
+import org.firstinspires.ftc.teamcode.drive.LocalizerKolhoz;
+import org.firstinspires.ftc.teamcode.drive.TwoWheelTrackingLocalizer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -66,29 +65,17 @@ public final class LogFiles {
         public double maxAngVel = DriveConstants.MAX_ANG_VEL;
         public double maxAngAccel = DriveConstants.MAX_ANG_ACCEL;
 
-        public double mecTransP = SampleMecanumDrive.TRANSLATIONAL_PID.kP;
-        public double mecTransI = SampleMecanumDrive.TRANSLATIONAL_PID.kI;
-        public double mecTransD = SampleMecanumDrive.TRANSLATIONAL_PID.kD;
-        public double mecHeadingP = SampleMecanumDrive.HEADING_PID.kP;
-        public double mecHeadingI = SampleMecanumDrive.HEADING_PID.kI;
-        public double mecHeadingD = SampleMecanumDrive.HEADING_PID.kD;
-        public double mecLateralMultiplier = SampleMecanumDrive.LATERAL_MULTIPLIER;
+        public double mecTransP = LocalizerKolhoz.TRANSLATIONAL_PID.kP;
+        public double mecTransI = LocalizerKolhoz.TRANSLATIONAL_PID.kI;
+        public double mecTransD = LocalizerKolhoz.TRANSLATIONAL_PID.kD;
+        public double mecHeadingP = LocalizerKolhoz.HEADING_PID.kP;
+        public double mecHeadingI = LocalizerKolhoz.HEADING_PID.kI;
+        public double mecHeadingD = LocalizerKolhoz.HEADING_PID.kD;
+        public double mecLateralMultiplier = LocalizerKolhoz.LATERAL_MULTIPLIER;
 
-        public double tankAxialP = SampleTankDrive.AXIAL_PID.kP;
-        public double tankAxialI = SampleTankDrive.AXIAL_PID.kI;
-        public double tankAxialD = SampleTankDrive.AXIAL_PID.kD;
-        public double tankCrossTrackP = SampleTankDrive.CROSS_TRACK_PID.kP;
-        public double tankCrossTrackI = SampleTankDrive.CROSS_TRACK_PID.kI;
-        public double tankCrossTrackD = SampleTankDrive.CROSS_TRACK_PID.kD;
-        public double tankHeadingP = SampleTankDrive.HEADING_PID.kP;
-        public double tankHeadingI = SampleTankDrive.HEADING_PID.kI;
-        public double tankHeadingD = SampleTankDrive.HEADING_PID.kD;
-
-        public double trackingTicksPerRev = StandardTrackingWheelLocalizer.TICKS_PER_REV;
-        public double trackingWheelRadius = StandardTrackingWheelLocalizer.WHEEL_RADIUS;
-        public double trackingGearRatio = StandardTrackingWheelLocalizer.GEAR_RATIO;
-        public double trackingLateralDistance = StandardTrackingWheelLocalizer.LATERAL_DISTANCE;
-        public double trackingForwardOffset = StandardTrackingWheelLocalizer.FORWARD_OFFSET;
+        public double trackingTicksPerRev = TwoWheelTrackingLocalizer.TICKS_PER_REV;
+        public double trackingWheelRadius = TwoWheelTrackingLocalizer.WHEEL_RADIUS;
+        public double trackingGearRatio = TwoWheelTrackingLocalizer.GEAR_RATIO;
 
         public RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR = DriveConstants.LOGO_FACING_DIR;
         public RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR = DriveConstants.USB_FACING_DIR;

@@ -81,6 +81,54 @@ public class BezierCurve {
             point3 = vector;
         }
     }
+    
+    public double getClosestValueToPoint(Vector2d point) {
+        int scans = 50;
+        double min = Double.MAX_VALUE, t = 0;
+        for (int i = 0; i <= scans; ++i) {
+            double distance = squaredDistance(point, getPointAt((double) i / scans));
+            if (distance < min) {
+                min = distance;
+                t = (double) i / scans;
+            }
+        }
+        return t;
+    }
+
+    public double getClosestTtoPoint(Vector2d point) {
+        int ind = 0, scans = 25;
+        double min = Double.MAX_VALUE;
+        for (int i = 0; i <= scans; ++i) {
+            double distance = squaredDistance(point, getPointAt((double) i / scans));
+            if (distance < min) {
+                min = distance;
+                ind = i;
+            }
+        }
+        double t0 = Math.max((double) (ind - 1) / scans, 0);
+        double t1 = Math.min((double) (ind + 1) / scans, 1);
+        return localMinimum(t0, t1, point);
+    }
+
+    public double localMinimum(double minX, double maxX, Vector2d point) {
+        double epsilon = 1e-10;
+        double left = minX, right = maxX, mid = (right + left) / 2;
+        while ((right - left) > epsilon) {
+            mid = (right + left) / 2;
+            double f1 = squaredDistance(point, getPointAt(mid - epsilon));
+            double f2 = squaredDistance(point, getPointAt(mid + epsilon));
+            if (f1 < f2) {
+                right = mid;
+            } else {
+                left = mid;
+            }
+        }
+        return mid;
+    }
+
+    private double squaredDistance(Vector2d point0, Vector2d point1) {
+        return Math.pow(point0.getX() - point1.getX(), 2) + Math.pow(point0.getY() - point1.getY(), 2);
+    }
 
     @NonNull
     @Override

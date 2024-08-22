@@ -23,6 +23,11 @@ android {
     }
 }
 
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+
 dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
@@ -32,6 +37,9 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation("org.assertj:assertj-core:3.26.3")
+
+    implementation 'com.ftc9929.TntFtcCore:corelib:0.9.0-beta'
+    testImplementation 'com.ftc9929.TntFtcCore:fakeHardware:0.9.0-beta'
 
     // compileOnly 'org.projectlombok:lombok:1.18.34'
     // annotationProcessor 'org.projectlombok:lombok:1.18.34'
