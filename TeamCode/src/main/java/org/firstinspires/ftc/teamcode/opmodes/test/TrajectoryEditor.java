@@ -35,12 +35,7 @@ public class TrajectoryEditor extends LinearOpMode {
 
         waitForStart();
 
-        String folderPath = String.format(
-                "%s/FIRST/data",
-                Environment
-                        .getExternalStorageDirectory()
-                        .getAbsolutePath()
-        );
+        String folderPath = String.format("%s/FIRST/data", Environment.getExternalStorageDirectory().getAbsolutePath());
 
         File dataFolder = new File(folderPath);
 
@@ -82,7 +77,6 @@ public class TrajectoryEditor extends LinearOpMode {
                     telemetry.addLine("Yes");
                     telemetry.update();
                 }
-
             }
             if (gamepad1.b) {
                 if (NEW_FILE_NAME == null) {
@@ -108,20 +102,14 @@ public class TrajectoryEditor extends LinearOpMode {
         BezierCurveLinkedList curves;
         if (!newFile) {
             try {
-                BezierCurve[] curvesArray = objectMapper.readValue(TrajectoryFiles.loadFile(chosenFileName),
-                        BezierCurve[].class);
+                BezierCurve[] curvesArray = objectMapper.readValue(TrajectoryFiles.loadFile(chosenFileName), BezierCurve[].class);
                 curves = new BezierCurveLinkedList(curvesArray);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else {
             curves = new BezierCurveLinkedList();
-            curves.add(new BezierCurve(
-                    new Vector2d(0, 0),
-                    new Vector2d(0, 10),
-                    new Vector2d(0, 20),
-                    new Vector2d(0, 30)
-            ));
+            curves.add(new BezierCurve(new Vector2d(0, 0), new Vector2d(0, 10), new Vector2d(0, 20), new Vector2d(0, 30)));
         }
 
         int currentPoint = 0;
@@ -163,28 +151,16 @@ public class TrajectoryEditor extends LinearOpMode {
             double deltaX = -gamepad1.right_stick_y * 0.1;
             double deltaY = -gamepad1.right_stick_x * 0.1;
 
-            Vector2d point = curves
-                    .getPoint(currentPoint)
-                    .plus(new Vector2d(deltaX, deltaY));
+            Vector2d point = curves.getPoint(currentPoint).plus(new Vector2d(deltaX, deltaY));
 
             curves.setPoint(currentPoint, point);
 
             if (gamepad1.a) {
                 if (curves.size() > 0) {
                     point = curves.get(curves.size() - 1).point3;
-                    curves.add(new BezierCurve(
-                            point,
-                            point.plus(new Vector2d(0, 5)),
-                            point.plus(new Vector2d(0, 10)),
-                            point.plus(new Vector2d(0, 15))
-                    ));
+                    curves.add(new BezierCurve(point, point.plus(new Vector2d(0, 5)), point.plus(new Vector2d(0, 10)), point.plus(new Vector2d(0, 15))));
                 } else {
-                    curves.add(new BezierCurve(
-                            new Vector2d(0, 0),
-                            new Vector2d(0, 5),
-                            new Vector2d(0, 10),
-                            new Vector2d(0, 15)
-                    ));
+                    curves.add(new BezierCurve(new Vector2d(0, 0), new Vector2d(0, 5), new Vector2d(0, 10), new Vector2d(0, 15)));
                 }
                 while (gamepad1.a) {
                     telemetry.addLine("Added a new curve");
