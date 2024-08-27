@@ -14,13 +14,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.dashboard.FieldDrawer;
 import org.firstinspires.ftc.teamcode.drive.Drive;
-import org.firstinspires.ftc.teamcode.file.TrajectoryFiles;
+import org.firstinspires.ftc.teamcode.file.FilesystemUtil;
 import org.firstinspires.ftc.teamcode.math.BezierCurve;
 import org.firstinspires.ftc.teamcode.math.BezierCurveLinkedList;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 @Autonomous
 @Config
@@ -40,7 +39,7 @@ public class TrajectoryFollower extends LinearOpMode {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            BezierCurve[] curvesArray = objectMapper.readValue(TrajectoryFiles.loadFile(AUTONOMOUS_NAME), BezierCurve[].class);
+            BezierCurve[] curvesArray = objectMapper.readValue(FilesystemUtil.loadFile(AUTONOMOUS_NAME), BezierCurve[].class);
             curves = new BezierCurveLinkedList(curvesArray);
         } catch (IOException e) {
             throw new RuntimeException(e);
