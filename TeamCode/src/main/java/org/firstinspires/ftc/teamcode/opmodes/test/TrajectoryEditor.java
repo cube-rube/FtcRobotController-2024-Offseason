@@ -14,20 +14,16 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.dashboard.FieldDrawer;
 import org.firstinspires.ftc.teamcode.file.FilesystemUtil;
 import org.firstinspires.ftc.teamcode.math.BezierCurve;
-import org.firstinspires.ftc.teamcode.math.BezierCurveLinkedList;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.Vector;
 
 @Config
 @TeleOp(group = "Trajectory")
 public class TrajectoryEditor extends LinearOpMode {
-
     public static String CUSTOM_FILE_NAME = null;
     public static int X = 0, Y = 0;
     private final FtcDashboard dashboard = FtcDashboard.getInstance();

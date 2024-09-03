@@ -18,5 +18,5 @@ public class TrajectoryBuilder {
         points = objectMapper.readValue(file, Vector2d[].class);
     }
 
-
+    
 }
