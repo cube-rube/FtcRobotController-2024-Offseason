@@ -1,11 +1,21 @@
 package org.firstinspires.ftc.teamcode.drive;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.auto.Trajectory;
+import org.firstinspires.ftc.teamcode.auto.TrajectoryBuilder;
+import org.firstinspires.ftc.teamcode.auto.TrajectoryRunner;
+import org.firstinspires.ftc.teamcode.file.FilesystemUtil;
+import org.firstinspires.ftc.teamcode.opmodes.test.TrajectoryFollower;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,9 +23,13 @@ import java.util.Objects;
 public class Drive {
 
     private final DcMotorEx leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive;
+    private final IMU imu;
 
     // TODO : НЕ КОЛХОЗИТЬ
-    private final LocalizerKolhoz localizer;
+    // private final LocalizerKolhoz localizer;
+    private final TwoWheelTrackingLocalizer localizer;
+
+    private final TrajectoryRunner runner;
 
 
     public Drive(HardwareMap hardwareMap, Pose2d startPose) {
@@ -33,9 +47,17 @@ public class Drive {
         leftFrontDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.DOWN, RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
+        imu.initialize(parameters);
+        imu.resetYaw();
+
         // Localizer
-        localizer = new LocalizerKolhoz(hardwareMap);
+        localizer = new TwoWheelTrackingLocalizer(hardwareMap, this);
         localizer.setPoseEstimate(startPose);
+
+        runner = new TrajectoryRunner();
     }
 
     public void setMotorPowers(double lf, double lb, double rf, double rb) {
@@ -123,5 +145,26 @@ public class Drive {
         assert wheelVelocities != null;
         return Math.sqrt(wheelVelocities.get(1) * wheelVelocities.get(1) +
                 wheelVelocities.get(3) * wheelVelocities.get(3));
+    }
+
+    public double getRawExternalHeading() {
+        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+    }
+
+    public Double getExternalHeadingVelocity() {
+        return (double) imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
+    }
+
+    public TrajectoryBuilder buildTrajectory(String file) throws IOException {
+        return new TrajectoryBuilder(FilesystemUtil.loadFile(file));
+    }
+
+    public void followTrajectory(Trajectory trajectory) {
+        runner.followTrajectory(trajectory);
+    }
+
+    public void update() {
+        Pose2d res = runner.update(getPoseEstimate());
+        setPowersByPose(res);
     }
 }

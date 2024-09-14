@@ -7,6 +7,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ftc9929.corelib.control.DebouncedButton;
 import com.ftc9929.corelib.control.NinjaGamePad;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -27,13 +28,23 @@ public class TrajectoryEditor extends LinearOpMode {
     public static String CUSTOM_FILE_NAME = null;
     public static int X = 0, Y = 0;
     private final FtcDashboard dashboard = FtcDashboard.getInstance();
-    private final NinjaGamePad gamePad1 = new NinjaGamePad(gamepad1);
-    private final NinjaGamePad gamePad2 = new NinjaGamePad(gamepad2);
+    private NinjaGamePad gamePad1;
+    private NinjaGamePad gamePad2;
 
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         ObjectMapper objectMapper = new ObjectMapper();
+
+        gamePad1 = new NinjaGamePad(gamepad1);
+        gamePad2 = new NinjaGamePad(gamepad2);
+
+        DebouncedButton dpadUp = gamePad1.getDpadUp().debounced();
+        DebouncedButton dpadDown = gamePad1.getDpadDown().debounced();
+        DebouncedButton aButton = gamePad1.getAButton().debounced();
+        DebouncedButton bButton = gamePad1.getBButton().debounced();
+        DebouncedButton xButton = gamePad1.getXButton().debounced();
+        DebouncedButton leftBumper = gamePad1.getLeftBumper().debounced();
 
         waitForStart();
 
@@ -57,19 +68,21 @@ public class TrajectoryEditor extends LinearOpMode {
             }
             telemetry.addLine("-------------------------------------");
             telemetry.addLine("Or create a new file by pressing B");
+            telemetry.addData("rise", gamePad1.getDpadDown().debounced().getRise());
+            telemetry.addData("fall", gamePad1.getDpadDown().debounced().getFall());
             telemetry.update();
 
-            if (gamePad1.getDpadUp().debounced().getRise()) {
+            if (dpadUp.getRise()) {
                 chosenFileIndex = (((chosenFileIndex - 1) % filesList.length) + filesList.length) % filesList.length;
             }
-            if (gamePad1.getDpadDown().debounced().getRise()) {
+            if (dpadDown.getRise()) {
                 chosenFileIndex = (chosenFileIndex + 1) % filesList.length;
             }
 
-            if (gamePad1.getDpadDown().debounced().getRise()) {
+            if (aButton.getRise()) {
                 chosenFileName = filesList[chosenFileIndex];
             }
-            if (gamePad1.getBButton().debounced().getRise()) {
+            if (bButton.getRise()) {
                 if (CUSTOM_FILE_NAME == null) {
                     int index = 0;
                     for (String s : filesList) {
@@ -133,10 +146,10 @@ public class TrajectoryEditor extends LinearOpMode {
             telemetry.addData("point Y coordinate", points.get(currentPoint).getY());
             telemetry.update();
 
-            if (gamePad1.getDpadUp().debounced().getRise()) {
+            if (dpadUp.getRise()) {
                 currentPoint = (currentPoint + 1) % points.size();
             }
-            if (gamePad1.getDpadDown().debounced().getRise()) {
+            if (dpadDown.getRise()) {
                 currentPoint = (((currentPoint - 1) % points.size()) + points.size()) % points.size();
             }
 
@@ -149,26 +162,28 @@ public class TrajectoryEditor extends LinearOpMode {
 
             points.set(currentPoint, point);
 
-            if (gamePad1.getAButton().debounced().getRise()) {
+            if (aButton.getRise()) {
                 point = points.get(points.size() - 1);
                 points.add(point.plus(new Vector2d(0, 5)));
                 points.add(point.plus(new Vector2d(0, 10)));
                 points.add(point.plus(new Vector2d(0, 15)));
             }
-            if (gamePad1.getBButton().debounced().getRise()) {
+            if (bButton.getRise()) {
                 points.remove(points.size() - 1);
                 points.remove(points.size() - 1);
                 points.remove(points.size() - 1);
             }
-            if (gamePad1.getXButton().debounced().getRise()) {
+            if (xButton.getRise()) {
                 points.set(currentPoint, new Vector2d(X, Y));
             }
-            if (gamePad1.getLeftBumper().debounced().getRise()) {
+            if (leftBumper.getRise()) {
                 try {
                     objectMapper.writeValue(chosenFile, points.toArray());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+                telemetry.addLine("Saved File");
+                telemetry.update();
             }
         }
     }

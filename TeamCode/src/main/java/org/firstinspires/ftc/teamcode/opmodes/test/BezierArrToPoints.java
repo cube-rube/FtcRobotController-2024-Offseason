@@ -14,7 +14,7 @@ import java.io.IOException;
 @Config
 @TeleOp
 public class BezierArrToPoints extends LinearOpMode {
-    public static String FILENAME = "";
+    public static String FILENAME = "traj.json";
 
     @Override
     public void runOpMode() throws InterruptedException {

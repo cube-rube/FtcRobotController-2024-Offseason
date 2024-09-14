@@ -51,7 +51,6 @@ public class TrajectoryFollower extends LinearOpMode {
         drive = new Drive(hardwareMap, startPose);
 
         double t = 0;
-        double tIncrement = 0.015;
         int curveIndex = 0;
 
         BezierCurve curve = new BezierCurve(
@@ -166,8 +165,9 @@ public class TrajectoryFollower extends LinearOpMode {
         }
     }
 
+    // [ 0, 0, 0, 0, 0, 0, 0]
     private void drawTrajectory(Canvas canvas) {
-        for (int i = 0; i < points.length; i += 3) {
+        for (int i = 0; i < points.length - 1; i += 3) {
             FieldDrawer.drawBezierCurve(
                     canvas,
                     new BezierCurve(
@@ -177,7 +177,8 @@ public class TrajectoryFollower extends LinearOpMode {
                             points[i + 3]
                     ),
                     1,
-                    "green");
+                    "green"
+            );
         }
         drive.updateLocalizer();
     }
