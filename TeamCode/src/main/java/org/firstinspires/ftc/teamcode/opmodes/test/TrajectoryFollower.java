@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.dashboard.FieldDrawer;
 import org.firstinspires.ftc.teamcode.drive.Drive;
 import org.firstinspires.ftc.teamcode.file.FilesystemUtil;
 import org.firstinspires.ftc.teamcode.math.BezierCurve;
-import org.firstinspires.ftc.teamcode.math.BezierCurveLinkedList;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +26,9 @@ public class TrajectoryFollower extends LinearOpMode {
     public static String AUTONOMOUS_NAME = "traj5.json";
     public static double kP = 0.28;
     public static double kCentripetal = 10.5;
+    public static double kAccel = 0.5;
+    public static double curvatureLimit = 0.03;
+    public static double curvatureDerivLimit = 1;
 
     private Drive drive;
     private Vector2d[] points;
@@ -46,6 +48,7 @@ public class TrajectoryFollower extends LinearOpMode {
 
         Pose2d startPose = new Pose2d(points[0], Math.toRadians(0));
         ArrayList<Pose2d> poseHistory = new ArrayList<>();
+        ArrayList<Vector2d> turnHistory = new ArrayList<>();
         poseHistory.add(startPose);
 
         drive = new Drive(hardwareMap, startPose);
@@ -84,10 +87,11 @@ public class TrajectoryFollower extends LinearOpMode {
             Vector2d normDer = derivative.div(derivative.norm());
 
             double curvature = curve.getCurvatureAt(t);
-            double curvatureDeriv = (curvature - lastCurvature) / cycle.seconds();
-            double kAccel = 1;
-            if (curvatureDeriv > 0 && curvature > 1) {
-                kAccel = 0.7;
+            double curvatureDeriv = (Math.abs(curvature) - Math.abs(lastCurvature)) / cycle.seconds();
+            double accel = 1;
+            if (curvatureDeriv > curvatureDerivLimit && Math.abs(curvature) > curvatureLimit) {
+                turnHistory.add(drive.getPoseEstimate().vec());
+                accel = kAccel;
             }
 
             Vector2d perpDer = normDer.rotated(Math.toRadians(90)).times(kCentripetal * curvature);
@@ -99,7 +103,7 @@ public class TrajectoryFollower extends LinearOpMode {
             // Vector2d pathing_power = normDer.rotated(angle);
             Vector2d pathing_power = normDer.plus(error);
 
-            Pose2d result = new Pose2d(pathing_power.plus(perpDer), 0);
+            Pose2d result = new Pose2d(pathing_power.plus(perpDer).times(accel), 0);
             drive.setPowersByPose(result);
 
             t = curve.getClosestTtoPoint(robotPosition.vec());
@@ -117,14 +121,13 @@ public class TrajectoryFollower extends LinearOpMode {
                 }
             }
 
-            // FieldDrawer.drawVectorFromPoint(canvas, reference, derivative, 1, "red");
-            // FieldDrawer.drawVectorFromPoint(canvas, reference, normDer.times(10), 2, "orange");
-            // FieldDrawer.drawVectorFromPoint(canvas, reference, secondDerivative, 1, "yellow");
-            // FieldDrawer.drawCircle(canvas, reference.plus(perpDer), perpDer.norm(), 1, "red");
             FieldDrawer.drawPoint(canvas, reference, 1, "blue");
 
             FieldDrawer.drawRobot(canvas, robotPosition);
             FieldDrawer.drawPoseHistory(canvas, poseHistory);
+            for (Vector2d vector : turnHistory) {
+                FieldDrawer.drawPoint(canvas, vector, 1, "yellow");
+            }
             FieldDrawer.drawVectorFromRobot(canvas, robotPosition.vec(), perpDer);
             FieldDrawer.drawVectorFromRobot(canvas, robotPosition.vec(), pathing_power);
 
@@ -141,6 +144,7 @@ public class TrajectoryFollower extends LinearOpMode {
             telemetry.addData("angle", angle);
             telemetry.addData("velocity x", pathing_power.getX());
             telemetry.addData("velocity y", pathing_power.getY());
+            telemetry.addData("kAccel", kAccel);
             telemetry.update();
 
             cycle.reset();

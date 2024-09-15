@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.auto.Trajectory;
 import org.firstinspires.ftc.teamcode.auto.TrajectoryBuilder;
 import org.firstinspires.ftc.teamcode.auto.TrajectoryRunner;
 import org.firstinspires.ftc.teamcode.file.FilesystemUtil;
-import org.firstinspires.ftc.teamcode.opmodes.test.TrajectoryFollower;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,12 +20,9 @@ import java.util.Objects;
 
 
 public class Drive {
-
     private final DcMotorEx leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive;
     private final IMU imu;
 
-    // TODO : НЕ КОЛХОЗИТЬ
-    // private final LocalizerKolhoz localizer;
     private final TwoWheelTrackingLocalizer localizer;
 
     private final TrajectoryRunner runner;
@@ -60,6 +56,34 @@ public class Drive {
         runner = new TrajectoryRunner();
     }
 
+    public Drive(HardwareMap hardwareMap) {
+        // Motors
+        leftFrontDrive = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftBackDrive = hardwareMap.get(DcMotorEx.class, "leftRear");
+        rightFrontDrive = hardwareMap.get(DcMotorEx.class, "rightFront");
+        rightBackDrive = hardwareMap.get(DcMotorEx.class, "rightRear");
+
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftFrontDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.DOWN, RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
+        imu.initialize(parameters);
+        imu.resetYaw();
+
+        // Localizer
+        localizer = new TwoWheelTrackingLocalizer(hardwareMap, this);
+        localizer.setPoseEstimate(new Pose2d(0, 0, 0));
+
+        runner = new TrajectoryRunner();
+    }
+
     public void setMotorPowers(double lf, double lb, double rf, double rb) {
         leftFrontDrive.setPower(lf);
         leftBackDrive.setPower(lb);
@@ -83,32 +107,32 @@ public class Drive {
         double heading = localizer.getPoseEstimate().getHeading();
 
         double rotLateral = lateral * Math.cos(-heading) - axial * Math.sin(-heading);
-        double rotAxial   = lateral * Math.sin(-heading) + axial * Math.cos(-heading);
+        double rotAxial = lateral * Math.sin(-heading) + axial * Math.cos(-heading);
 
         rotLateral = rotLateral * 1.1;
 
-        double leftFrontPower  = rotAxial + rotLateral + yaw;
+        double leftFrontPower = rotAxial + rotLateral + yaw;
         double rightFrontPower = rotAxial - rotLateral - yaw;
-        double leftBackPower   = rotAxial - rotLateral + yaw;
-        double rightBackPower  = rotAxial + rotLateral - yaw;
+        double leftBackPower = rotAxial - rotLateral + yaw;
+        double rightBackPower = rotAxial + rotLateral - yaw;
 
         double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
         max = Math.max(max, Math.abs(leftBackPower));
         max = Math.max(max, Math.abs(rightBackPower));
 
         if (max > 1.0) {
-            leftFrontPower  /= max;
+            leftFrontPower /= max;
             rightFrontPower /= max;
-            leftBackPower   /= max;
-            rightBackPower  /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
         }
 
         setMotorPowers(leftFrontPower,
                 leftBackPower,
                 rightFrontPower,
                 rightBackPower);
-        return new double[] {leftFrontPower, leftBackPower,
-        rightFrontPower, rightBackPower};
+        return new double[]{leftFrontPower, leftBackPower,
+                rightFrontPower, rightBackPower};
     }
 
     public void updateLocalizer() {
@@ -120,8 +144,8 @@ public class Drive {
     }
 
     public double[] getMotorPowers() {
-        return new double[] {leftFrontDrive.getPower(), leftBackDrive.getPower(),
-        rightFrontDrive.getPower(), rightBackDrive.getPower()};
+        return new double[]{leftFrontDrive.getPower(), leftBackDrive.getPower(),
+                rightFrontDrive.getPower(), rightBackDrive.getPower()};
     }
 
     public List<Double> getWheelVelocities() {
@@ -142,7 +166,6 @@ public class Drive {
 
     public double getVelocityInTicks() {
         List<Double> wheelVelocities = localizer.getWheelVelocities();
-        assert wheelVelocities != null;
         return Math.sqrt(wheelVelocities.get(1) * wheelVelocities.get(1) +
                 wheelVelocities.get(3) * wheelVelocities.get(3));
     }
@@ -160,6 +183,7 @@ public class Drive {
     }
 
     public void followTrajectory(Trajectory trajectory) {
+        localizer.setPoseEstimate(new Pose2d(trajectory.get(0).point0, Math.toRadians(0)));
         runner.followTrajectory(trajectory);
     }
 

@@ -8,12 +8,12 @@ import java.util.List;
 
 public class Trajectory {
     private final Vector2d[] points;
-    private final StopPoint[] stopPoints;
+    private final List<StopPoint> stopPoints;
     private final List<SpatialMarker> markers;
 
     Trajectory(Vector2d[] points, List<StopPoint> stopPoints, List<SpatialMarker> markers) {
         this.points = points;
-        this.stopPoints = stopPoints.toArray(new StopPoint[0]);
+        this.stopPoints = stopPoints;
         this.markers = markers;
     }
 
@@ -32,5 +32,9 @@ public class Trajectory {
 
     public List<SpatialMarker> getMarkers() {
         return markers;
+    }
+
+    public List<StopPoint> getStopPoints() {
+        return stopPoints;
     }
 }
