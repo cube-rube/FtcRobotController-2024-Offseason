@@ -1,20 +1,12 @@
 package org.firstinspires.ftc.teamcode.auto;
 
 public class SpatialMarker {
-    private VariableProducer producer;
+    public double t;
     private MarkerRunnable runnable;
 
-    SpatialMarker(VariableProducer producer, MarkerRunnable runnable) {
-        this.setProducer(producer);
+    SpatialMarker(double t, MarkerRunnable runnable) {
+        this.t = t;
         this.setRunnable(runnable);
-    }
-
-    public VariableProducer getProducer() {
-        return producer;
-    }
-
-    public void setProducer(VariableProducer producer) {
-        this.producer = producer;
     }
 
     public MarkerRunnable getRunnable() {

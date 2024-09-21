@@ -99,7 +99,38 @@ public class Drive {
 
     }
 
-    public double[] setPowersByPose(Pose2d pose) {
+    public double[] setPowerByPose(Pose2d pose) {
+        double axial = pose.getX();
+        double lateral = -pose.getY();
+        double yaw = pose.getHeading();
+
+        lateral = lateral * 1.1;
+
+        double leftFrontPower = axial + lateral + yaw;
+        double rightFrontPower = axial - lateral - yaw;
+        double leftBackPower = axial - lateral + yaw;
+        double rightBackPower = axial + lateral - yaw;
+
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        setMotorPowers(leftFrontPower,
+                leftBackPower,
+                rightFrontPower,
+                rightBackPower);
+        return new double[]{leftFrontPower, leftBackPower,
+                rightFrontPower, rightBackPower};
+    }
+
+    public double[] setPowerByPoseField(Pose2d pose) {
         double axial = pose.getX();
         double lateral = -pose.getY();
         double yaw = pose.getHeading();
@@ -140,7 +171,13 @@ public class Drive {
     }
 
     public Pose2d getPoseEstimate() {
+        updateLocalizer();
         return localizer.getPoseEstimate();
+    }
+
+    public Pose2d getVelocityEstimate() {
+        updateLocalizer();
+        return localizer.getPoseVelocity();
     }
 
     public double[] getMotorPowers() {
@@ -182,13 +219,18 @@ public class Drive {
         return new TrajectoryBuilder(FilesystemUtil.loadFile(file));
     }
 
+    public TrajectoryBuilder buildTrajectory(String file, double startHeading) throws IOException {
+        localizer.setPoseEstimate(new Pose2d(0, 0, startHeading));
+        return new TrajectoryBuilder(FilesystemUtil.loadFile(file));
+    }
+
     public void followTrajectory(Trajectory trajectory) {
-        localizer.setPoseEstimate(new Pose2d(trajectory.get(0).point0, Math.toRadians(0)));
+        localizer.setPoseEstimate(new Pose2d(trajectory.get(0).point0, Math.toRadians(localizer.getHeading())));
         runner.followTrajectory(trajectory);
     }
 
     public void update() {
-        Pose2d res = runner.update(getPoseEstimate());
-        setPowersByPose(res);
+        Pose2d res = runner.update(getPoseEstimate(), getVelocityEstimate());
+        setPowerByPoseField(res);
     }
 }

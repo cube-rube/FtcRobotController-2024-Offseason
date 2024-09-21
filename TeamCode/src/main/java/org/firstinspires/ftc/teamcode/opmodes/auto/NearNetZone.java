@@ -1,6 +1,7 @@
-package org.firstinspires.ftc.teamcode.opmodes.test;
+package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -10,11 +11,12 @@ import org.firstinspires.ftc.teamcode.drive.Drive;
 
 import java.io.IOException;
 
+@Config
 @Autonomous
-public class AutoTest extends LinearOpMode {
+public class NearNetZone extends LinearOpMode {
     private Drive drive;
-    private final FtcDashboard dashboard = FtcDashboard.getInstance();
 
+    private FtcDashboard dashboard = FtcDashboard.getInstance();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -24,15 +26,20 @@ public class AutoTest extends LinearOpMode {
 
         Trajectory traj;
         try {
-            traj = drive.buildTrajectory("traj4.json")
+            traj = drive.buildTrajectory("traj6.json")
+                    .waitForAt(.9, 2000)
+                    .waitForAt(1.9, 2000)
+                    .waitForAt(2.9, 2000)
+                    .waitForAt(3.9, 2000)
+                    .waitForAt(4.9, 2000)
                     .build();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        drive.followTrajectory(traj);
         waitForStart();
 
+        drive.followTrajectory(traj);
         while (opModeIsActive()) {
             drive.update();
         }

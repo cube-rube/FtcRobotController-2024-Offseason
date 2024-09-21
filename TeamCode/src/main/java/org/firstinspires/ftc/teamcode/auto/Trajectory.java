@@ -19,10 +19,10 @@ public class Trajectory {
 
     public BezierCurve get(int i) {
         return new BezierCurve(
-                points[i / 3],
-                points[i / 3 + 1],
-                points[i / 3 + 2],
-                points[i / 3 + 3]
+                points[i * 3],
+                points[i * 3 + 1],
+                points[i * 3 + 2],
+                points[i * 3 + 3]
         );
     }
 

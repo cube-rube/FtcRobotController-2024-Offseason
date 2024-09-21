@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.test;
+package org.firstinspires.ftc.teamcode.opmodes.util;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
@@ -104,7 +104,7 @@ public class TrajectoryFollower extends LinearOpMode {
             Vector2d pathing_power = normDer.plus(error);
 
             Pose2d result = new Pose2d(pathing_power.plus(perpDer).times(accel), 0);
-            drive.setPowersByPose(result);
+            drive.setPowerByPoseField(result);
 
             t = curve.getClosestTtoPoint(robotPosition.vec());
             if (Math.abs(t - 1) <= 1e-6) {
@@ -154,7 +154,7 @@ public class TrajectoryFollower extends LinearOpMode {
             Pose2d robotPosition = drive.getPoseEstimate();
             Vector2d reference = curve.getPointAt(t);
             Vector2d error = reference.minus(robotPosition.vec()).times(kP);
-            drive.setPowersByPose(new Pose2d(error.times(kP), 0));
+            drive.setPowerByPoseField(new Pose2d(error.times(kP), 0));
 
             TelemetryPacket packet = new TelemetryPacket();
             Canvas canvas = packet.fieldOverlay();

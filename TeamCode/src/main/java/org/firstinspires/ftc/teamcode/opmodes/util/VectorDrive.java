@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.test;
+package org.firstinspires.ftc.teamcode.opmodes.util;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.drive.Drive;
 @Config
 @TeleOp
 public class VectorDrive extends LinearOpMode {
-
     private final FtcDashboard dashboard = FtcDashboard.getInstance();
     public static double X = 0;
     public static double Y = 0;
@@ -30,7 +29,11 @@ public class VectorDrive extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            for (double power : drive.setPowersByPose(new Pose2d(X, Y, 0))) {
+            for (double power : drive.setPowerByPose(new Pose2d(
+                    -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    gamepad1.right_trigger - gamepad1.left_trigger
+            ))) {
                 telemetry.addLine(String.valueOf(power));
             }
             for (double power : drive.getMotorPowers()) {
@@ -38,12 +41,14 @@ public class VectorDrive extends LinearOpMode {
             }
             drive.updateLocalizer();
             telemetry.addData("Heading", drive.getPoseEstimate().getHeading());
+            telemetry.addData("x", drive.getPoseEstimate().getX());
+            telemetry.addData("y", drive.getPoseEstimate().getY());
             telemetry.update();
 
             TelemetryPacket packet = new TelemetryPacket();
             Canvas canvas = packet.fieldOverlay();
             Vector2d pos = drive.getPoseEstimate().vec();
-            FieldDrawer.drawVectorFromRobot(canvas, pos, new Vector2d(X, Y));
+            FieldDrawer.drawVectorFromRobot(canvas, pos, new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x));
             FieldDrawer.drawPoint(canvas, pos, 1, "blue");
             FieldDrawer.drawRobot(canvas, drive.getPoseEstimate());
             dashboard.sendTelemetryPacket(packet);
