@@ -30,10 +30,6 @@ public class TrajectoryRunner {
 
     public static double kP = 0.2;
     public static double kCentripetal = 0.00001;
-    public static double kAccel = 0.9;
-    public static double kTurnAccel = 0.8;
-    public static double curvatureLimit = 0.03;
-    public static double curvatureDerivLimit = 1;
 
     public static boolean uselessFlag = false;
 
@@ -70,8 +66,8 @@ public class TrajectoryRunner {
         Vector2d normDeriv = derivative.div(derivative.norm());
 
         double curvature = currentCurve.getCurvatureAt(t);
-        double curvatureDeriv = (Math.abs(curvature) - Math.abs(lastCurvature)) / clock.seconds();
-        double accel = kAccel;
+        // double curvatureDeriv = (Math.abs(curvature) - Math.abs(lastCurvature)) / clock.seconds();
+        double accel = curvatureToForce(curvature);
         /*
         if (curvatureDeriv > curvatureDerivLimit && Math.abs(curvature) > curvatureLimit) {
             turnHistory.add(poseEstimate.vec());
@@ -161,5 +157,9 @@ public class TrajectoryRunner {
                     "green"
             );
         }
+    }
+
+    private double curvatureToForce(double curvature) {
+        return 0.9;
     }
 }
